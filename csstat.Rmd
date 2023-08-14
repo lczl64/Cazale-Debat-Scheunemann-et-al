@@ -1,0 +1,83 @@
+---
+title: "CS stats"
+output: html_document
+date: "Cazalé-Debat et al. 2023"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+rm(list=ls())
+data<-read.delim("/Users/cazaledl-admin/Library/CloudStorage/OneDrive-UniversityofBirmingham/Post_doc/XP/data/courtscape/screen/text/CS-fig1.txt",h=T,sep="\t",na.strings = "NA", stringsAsFactors=T)
+
+library(conover.test)
+library(beeswarm)
+attach(data)
+library(knitr)
+
+```
+
+```{r}
+# ACTION - SELECTION : COURTSHIP INDEX - SUMMARY OF THE DATA - 
+```
+
+
+```{r summary data CI, echo=FALSE, paged.print=TRUE}
+a<-summary(CI [which(threat == 'ETNT')])
+b<-length (CI [which(threat == 'ETNT')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'CS_nothreat'
+rownames(data1)<-c(names(a), 'sample_size')
+
+h<-summary(CI[which(threat == 'ET')])
+i<-length (CI[which(threat == 'ET')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'CS_threat'
+
+alldata<-cbind(data1,data4)
+kable(alldata[c(-1,-6),], caption = "courtship index - summary by treatment")
+```
+```{r}
+# ACTION - SELECTION : COURTSHIP INDEX - WILCOX.TEST - 
+```
+
+
+```{r echo=FALSE}
+wilcox.test(data$CI[which(threat == 'ETNT')],
+            data$CI[which(threat == 'ET')] )
+```
+
+```{r}
+# ACTION - SELECTION : DEFENSIVE INDEX - SUMMARY OF THE DATA - 
+```
+
+
+```{r summary data DI, echo=FALSE, paged.print=TRUE}
+a<-summary(DI [which(threat == 'ETNT')])
+b<-length (DI [which(threat == 'ETNT')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'CS_nothreat'
+rownames(data1)<-c(names(a), 'sample_size')
+
+h<-summary(DI[which(threat == 'ET')])
+i<-length (DI[which(threat == 'ET')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'CS_threat'
+
+alldata<-cbind(data1,data4)
+kable(alldata[c(-1,-6),], caption = "defensive index - summary by treatment")
+```
+
+```{r}
+# ACTION - SELECTION : DEFENSIVE INDEX - WILCOX.TEST - 
+```
+
+
+```{r defensive index - wilcoxon test no threat / threat, echo=FALSE}
+
+wilcox.test(data$DI[which(threat == 'ETNT')],
+            data$DI[which(threat == 'ET')] )
+```
+

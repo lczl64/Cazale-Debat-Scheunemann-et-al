@@ -1,0 +1,394 @@
+---
+title: ""
+author: "Cazalé-Debat et al. 2023"
+output:
+ 
+  html_document: default
+  
+---
+
+```{r start, include=FALSE}
+rm(list=ls())
+data<-read.delim("/Users/cazaledl-admin/Library/CloudStorage/OneDrive-UniversityofBirmingham/Post_doc/XP/data/courtscape/screen/text/.txt",h=T,sep="\t",na.strings = "NA", stringsAsFactors=T)
+
+library(beeswarm)
+library(conover.test)
+library(knitr)
+library(tinytex)
+library(rmarkdown)
+attach(data)
+
+data$newvar <- character(nrow(data))
+data$newvar[data$line == ""]      <- "gal4line"     
+data$newvar[data$line == ""]       <- "uasline"      
+data$newvar[data$line == ""] <- "xp_line"       
+attach(data)
+```
+
+```{r title ACTION-SELECTION + OPTOGENETIC MANIPULATION - SUMMARY OF THE DATA}
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION (LIGHT OFF) - COURTSHIP INDEX - SUMMARY OF THE DATA 
+```
+
+```{r summary data OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI) - LIGHT OFF, echo=FALSE, paged.print=TRUE}
+
+
+a<-summary(CI[which(newvar=='gal4line' & threat == 'ETNT' & status_light=='OFF')])
+b<-length(CI[which(newvar=='gal4line'  & threat == 'ETNT' & status_light=='OFF')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat_lightoff'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(CI[which(newvar=='uasline' & threat == 'ETNT' & status_light=='OFF')])
+e<-length(CI[which(newvar=='uasline' & threat == 'ETNT'  & status_light=='OFF')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat_lightoff'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='OFF')])
+g<-length(CI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='OFF')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat_lightoff'
+alldata_nothreat_lightoff<-cbind(data1,data2,data3)
+
+h<-summary(CI[which(newvar=='gal4line' & threat == 'ET' & status_light=='OFF')])
+i<-length(CI[which(newvar=='gal4line' & threat == 'ET' & status_light=='OFF')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat_lightoff'
+
+j<-summary(CI[which(newvar=='uasline' & threat == 'ET' & status_light=='OFF')])
+k<-length(CI[which(newvar=='uasline' & threat == 'ET'  & status_light=='OFF')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat_lightoff'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ET' & status_light=='OFF')])
+g<-length(CI[which(newvar=='xp_line' & threat == 'ET'  & status_light=='OFF')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat_lightoff'
+alldata_threat_lightoff<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat_lightoff,alldata_threat_lightoff)
+kable(alldata[c(-1,-6),], caption = "courtship index light OFF - summary by line and treatment")
+
+```
+
+```{r title ACTION-SELECTION + OPTOGENETIC MANIPULATION: COURTSHIP INDEX (CI) - LIGHT OFF }
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION: COURTSHIP INDEX (CI) - LIGHT OFF 
+```
+
+```{r CALCUL OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI)  , include=FALSE}
+
+courtship_index_LIGHTOFF <- 
+     
+     c(CI  [which(threat=="ETNT" & newvar=="gal4line"  & status_light=='OFF')],
+       CI  [which(threat=="ETNT" & newvar=="uasline"   & status_light=='OFF')],
+       CI  [which(threat=="ETNT" & newvar=="xp_line"   & status_light=='OFF')],
+       
+       CI  [which(threat=="ET" & newvar=="gal4line"   & status_light=='OFF')],
+       CI  [which(threat=="ET" & newvar=="uasline"    & status_light=='OFF')],
+       CI  [which(threat=="ET" & newvar=="xp_line"    & status_light=='OFF')])
+
+line_LIGHTOFF_treatment <- factor (rep(1:6,c( 
+                                      
+                       length(CI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='OFF')]), 
+                       length(CI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='OFF')]),
+                       length(CI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='OFF')]),
+                       
+                       length(CI  [which(threat=="ET" & newvar=="gal4line" & status_light=='OFF')]),
+                       length(CI  [which(threat=="ET" & newvar=="uasline"  & status_light=='OFF')]),
+                       length(CI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='OFF')]))),
+                  
+            labels = c(
+              "CI_gal4line;No threat",
+              "CI_uasline;No threat",
+              "CI_xp_line; No threat",  
+              
+              "CI_gal4line;Early threat",
+              "CI_uasline; Early threat",
+              "CI_xp_line; Early threat"))
+
+courtship_index_LIGHTON <- 
+     
+     c(CI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='ON')],
+       CI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='ON')],
+       CI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='ON')],
+       
+       CI  [which(threat=="ET" & newvar=="gal4line" & status_light=='ON')],
+       CI  [which(threat=="ET" & newvar=="uasline"  & status_light=='ON')],
+       CI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='ON')])
+
+line_LIGHTON_treatment <- factor(rep(1:6, c(
+                                      
+                       length(CI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='ON')]), 
+                       length(CI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='ON')]),
+                       length(CI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='ON')]),
+                       
+                       length(CI  [which(threat=="ET" & newvar=="gal4line" & status_light=='ON')]),
+                       length(CI  [which(threat=="ET" & newvar=="uasline"  & status_light=='ON')]),
+                       length(CI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='ON')]))),
+                  
+            labels = c(
+              "CI_gal4line;No threat",
+              "CI_uasline;No threat",
+              "CI_xp_line;No threat",  
+              
+              "CI_gal4line;early threat",
+              "CI_uasline;Early threat",
+              "CI_xp_line;Early threat"))
+
+
+
+```
+
+```{r KW OPTOGENETIC + THREAT - COURTSHIP INDEX (CI) - LIGHT OFF, echo=FALSE, comment=NA}
+
+kruskal.test(courtship_index_LIGHTOFF,line_LIGHTOFF_treatment)
+```
+
+```{r conover.test OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI) - LIGHT OFF, echo=FALSE, comment=NA, paged.print=TRUE}
+             conover.test(
+             courtship_index_LIGHTOFF, 
+             line_LIGHTOFF_treatment, 
+             method="bonferroni", 
+             list=TRUE, table=F, kw=F)
+```
+
+
+```{r title ACTION-SELECTION + OPTOGENETIC MANIPULATION - def SUMMARY OF THE DATA}
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION (LIGHT OFF) - DEFENSIVE INDEX - SUMMARY OF THE DATA
+```
+
+```{r summary data DEFENSIVE INDEX (DI) - LIGHT OFF, echo=FALSE, paged.print=TRUE}
+a<-summary(DI[which(newvar=='gal4line' & threat == 'ETNT' & status_light=='OFF')])
+b<-length(DI[which(newvar=='gal4line'  & threat == 'ETNT' & status_light=='OFF')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat_lightoff'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(DI[which(newvar=='uasline' & threat == 'ETNT' & status_light=='OFF')])
+e<-length(DI[which(newvar=='uasline' & threat == 'ETNT'  & status_light=='OFF')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat_lightoff'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='OFF')])
+g<-length(DI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='OFF')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat_lightoff'
+alldata_nothreat_lightoff<-cbind(data1,data2,data3)
+
+h<-summary(DI[which(newvar=='gal4line' & threat == 'ET' & status_light=='OFF')])
+i<-length(DI[which(newvar=='gal4line' & threat == 'ET' & status_light=='OFF')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat_lightoff'
+
+j<-summary(DI[which(newvar=='uasline' & threat == 'ET' & status_light=='OFF')])
+k<-length(DI[which(newvar=='uasline' & threat == 'ET'  & status_light=='OFF')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat_lightoff'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ET' & status_light=='OFF')])
+g<-length(DI[which(newvar=='xp_line' & threat == 'ET'  & status_light=='OFF')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat_lightoff'
+alldata_threat_lightoff<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat_lightoff,alldata_threat_lightoff)
+kable(alldata[c(-1,-6),], caption = "defensive index light OFF - summary by line and treatment")
+
+```
+
+```{r title OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT OFF}
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION (LIGHT OFF) - DEFENSIVE INDEX 
+```
+
+```{r CALCUL OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT OFF, include=FALSE}
+
+defensive_index_LIGHTOFF <- 
+     
+     c(DI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='OFF')],
+       DI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='OFF')],
+       DI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='OFF')],
+       
+       DI  [which(threat=="ET" & newvar=="gal4line" & status_light=='OFF')],
+       DI  [which(threat=="ET" & newvar=="uasline"  & status_light=='OFF')],
+       DI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='OFF')])
+
+line_LIGHTOFF_treatment <- factor(rep(1:6, 
+                                      
+                    c( length(DI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='OFF')]), 
+                       length(DI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='OFF')]),
+                       length(DI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='OFF')]),
+                       
+                       length(DI  [which(threat=="ET" & newvar=="gal4line" & status_light=='OFF')]),
+                       length(DI  [which(threat=="ET" & newvar=="uasline"  & status_light=='OFF')]),
+                       length(DI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='OFF')]))),
+                  
+            labels = c(
+              "DIgal4line_nothreat_lightoff",
+              "DIuasline_nothreat_lightoff",
+              "DIxp_line_nothreat_lightoff",
+              
+              "DIgal4line_threat_lightoff",
+              "DIuasline_threat_lightoff",
+              "DIxp_line_threat_lightoff"))
+
+
+defensive_index_LIGHTON <- 
+     
+     c(DI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='ON')],
+       DI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='ON')],
+       DI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='ON')],
+       
+       DI  [which(threat=="ET" & newvar=="gal4line" & status_light=='ON')],
+       DI  [which(threat=="ET" & newvar=="uasline"  & status_light=='ON')],
+       DI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='ON')])
+
+line_LIGHTON_treatment <- factor(rep(1:6, 
+                                      
+                     c(length(DI  [which(threat=="ETNT" & newvar=="gal4line" & status_light=='ON')]), 
+                       length(DI  [which(threat=="ETNT" & newvar=="uasline"  & status_light=='ON')]),
+                       length(DI  [which(threat=="ETNT" & newvar=="xp_line"  & status_light=='ON')]),
+                       
+                       length(DI  [which(threat=="ET" & newvar=="gal4line" & status_light=='ON')]),
+                       length(DI  [which(threat=="ET" & newvar=="uasline"  & status_light=='ON')]),
+                       length(DI  [which(threat=="ET" & newvar=="xp_line"  & status_light=='ON')]))),
+                  
+            labels = c(
+              "DIgal4line_nothreat_lighton",
+              "DIuasline_nothreat_lighton",
+              "DIxp_line_nothreat_lighton",
+              
+              "DIgal4line_threat_lighton",
+              "DIuasline_threat_lighton",
+              "DIxp_line_threat_lighton"))
+```
+
+```{r KW OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT OFF, echo=FALSE, comment=NA}
+
+kruskal.test(defensive_index_LIGHTOFF,line_LIGHTOFF_treatment)
+```
+
+```{r conover.test OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT OFF, echo=FALSE, comment=NA}
+
+             conover.test(
+             defensive_index_LIGHTOFF, 
+             line_LIGHTOFF_treatment, 
+             method="bonferroni", 
+             list=TRUE, table=F, kw=F)
+
+
+```
+
+```{r title OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI) - LIGHT ON}
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION (LIGHT ON) - COURTSHIP INDEX - SUMMARY OF THE DATA 
+```
+
+```{r summary data COURTSHIP INDEX (CI) - LIGHT ON, echo=FALSE, paged.print=TRUE}
+a<-summary(CI[which(newvar=='gal4line' & threat == 'ETNT' & status_light=='ON')])
+b<-length(CI[which(newvar=='gal4line'  & threat == 'ETNT' & status_light=='ON')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat_lighton'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(CI[which(newvar=='uasline' & threat == 'ETNT' & status_light=='ON')])
+e<-length(CI[which(newvar=='uasline' & threat == 'ETNT'  & status_light=='ON')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat_lighton'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='ON')])
+g<-length(CI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='ON')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat_lighton'
+alldata_nothreat_lighton<-cbind(data1,data2,data3)
+
+h<-summary(CI[which(newvar=='gal4line' & threat == 'ET' & status_light=='ON')])
+i<-length(CI[which(newvar=='gal4line' & threat == 'ET' & status_light=='ON')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat_lighton'
+
+j<-summary(CI[which(newvar=='uasline' & threat == 'ET' & status_light=='ON')])
+k<-length(CI[which(newvar=='uasline' & threat == 'ET'  & status_light=='ON')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat_lighton'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ET' & status_light=='ON')])
+g<-length(CI[which(newvar=='xp_line'  & threat == 'ET'  & status_light=='ON')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat_lighton'
+alldata_threat_lighton<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat_lighton,alldata_threat_lighton)
+kable(alldata[c(-1,-6),], caption = "courtship index light ON - summary by line and treatment")
+
+```
+```{r title ACTION-SELECTION + OPTOGENETIC MANIPULATION: COURTSHIP INDEX (CI) - LIGHT ON }
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION: COURTSHIP INDEX (CI) - LIGHT ON 
+```
+
+
+
+```{r KW OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI) - LIGHT ON, echo=FALSE, comment=NA}
+kruskal.test(courtship_index_LIGHTON,line_LIGHTON_treatment)
+```
+
+```{r conover.test OPTOGENETIC + THREAT EXPERIMENT COURTSHIP INDEX (CI) - LIGHT ON, echo=FALSE,comment=NA}
+conover.test(courtship_index_LIGHTON, line_LIGHTON_treatment, method="bonferroni", list=TRUE, table=F, kw=F )
+
+```
+
+```{r title OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT ON }
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION (LIGHT ON) - DEFENSIVE INDEX - SUMMARY OF THE DATA 
+```
+
+```{r summary data OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT ON, echo=FALSE, paged.print=TRUE}
+a<-summary(DI[which(newvar=='gal4line' & threat == 'ETNT' & status_light=='ON')])
+b<-length(DI[which(newvar=='gal4line'  & threat == 'ETNT' & status_light=='ON')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat_lighton'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(DI[which(newvar=='uasline' & threat == 'ETNT' & status_light=='ON')])
+e<-length(DI[which(newvar=='uasline' & threat == 'ETNT'  & status_light=='ON')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat_lighton'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='ON')])
+g<-length(DI[which(newvar=='xp_line' & threat == 'ETNT' & status_light=='ON')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat_lighton'
+alldata_nothreat_lighton<-cbind(data1,data2,data3)
+
+h<-summary(DI[which(newvar=='gal4line' & threat == 'ET' & status_light=='ON')])
+i<-length(DI[which(newvar=='gal4line' & threat == 'ET' & status_light=='ON')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat_lighton'
+
+j<-summary(DI[which(newvar=='uasline' & threat == 'ET' & status_light=='ON')])
+k<-length(DI[which(newvar=='uasline' & threat == 'ET'  & status_light=='ON')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat_lighton'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ET' & status_light=='ON')])
+g<-length(DI[which(newvar=='xp_line'  & threat == 'ET'  & status_light=='ON')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat_lighton'
+alldata_threat_lighton<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat_lighton,alldata_threat_lighton)
+kable(alldata[c(-1,-6),], caption = "defensive index light ON - summary by line and treatment")
+
+```
+```{r title CTION-SELECTION + OPTOGENETIC MANIPULATION: DEFENSIVE INDEX (DI) - LIGHT ON  }
+# ACTION-SELECTION + OPTOGENETIC MANIPULATION: DEFENSIVE INDEX (DI) - LIGHT ON 
+```
+
+
+```{r KW OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT ON, echo=FALSE, comment=NA}
+kruskal.test(defensive_index_LIGHTON,line_LIGHTON_treatment)
+```
+
+```{r conover.test OPTOGENETIC + THREAT EXPERIMENT DEFENSIVE INDEX (DI) - LIGHT ON, echo=FALSE,comment=NA}
+conover.test(defensive_index_LIGHTON, 
+             line_LIGHTON_treatment, 
+             method="bonferroni", 
+             list=TRUE, table=F, kw=F )
+
+```

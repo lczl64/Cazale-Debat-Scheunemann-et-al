@@ -1,0 +1,198 @@
+---
+title: ""
+author: "Cazalé-Debat et al. 2023"
+output:
+ 
+  html_document: default
+  
+---
+
+```{r start, include=FALSE}
+rm(list=ls())
+data<-read.delim("/Users/cazaledl-admin/Library/CloudStorage/OneDrive-UniversityofBirmingham/Post_doc/XP/data/courtscape/screen/text/.txt",h=T,sep="\t",na.strings = "NA", stringsAsFactors=T)
+
+library(beeswarm)
+library(conover.test)
+library(knitr)
+library(tinytex)
+library(rmarkdown)
+attach(data)
+
+data$newvar <- character(nrow(data))
+data$newvar[data$line == ""]      <- "gal4line"     
+data$newvar[data$line == ""]       <- "uasline"      
+data$newvar[data$line == ""] <- "xp_line"       
+attach(data)
+```
+
+```{r}
+# ACTION - SELECTION : COURTSHIP INDEX - SUMMARY OF THE DATA & STATS - 
+```
+
+```{r summary data CI, echo=FALSE, paged.print=TRUE}
+
+a<-summary(CI[which(newvar=='gal4line' & threat == 'ETNT')])
+b<-length(CI[which(newvar=='gal4line' & threat == 'ETNT')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(CI[which(newvar=='uasline' & threat == 'ETNT')])
+e<-length(CI[which(newvar=='uasline' & threat == 'ETNT')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ETNT')])
+g<-length(CI[which(newvar=='xp_line' & threat == 'ETNT')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat'
+alldata_nothreat<-cbind(data1,data2,data3)
+
+h<-summary(CI[which(newvar=='gal4line' & threat == 'ET')])
+i<-length(CI[which(newvar=='gal4line' & threat == 'ET')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat'
+
+j<-summary(CI[which(newvar=='uasline' & threat == 'ET')])
+k<-length(CI[which(newvar=='uasline' & threat == 'ET')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat'
+
+f<-summary(CI[which(newvar=='xp_line' & threat == 'ET')])
+g<-length(CI[which(newvar=='xp_line' & threat == 'ET')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat'
+alldata_threat<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat,alldata_threat)
+kable(alldata[c(-1,-6),], caption = "courtship index - summary by line and treatment")
+
+```
+
+```{r courtship index, include=FALSE}
+
+courtship_index <- 
+     c(CI  [which(threat=="ETNT" & newvar=="gal4line")]  ,
+       CI  [which(threat=="ETNT" & newvar=="uasline" )]  ,
+       CI  [which(threat=="ETNT" & newvar=="xp_line" )]  ,
+       
+       CI  [which(threat=="ET" & newvar=="gal4line")]    ,
+       CI  [which(threat=="ET" & newvar=="uasline" )]    ,
+       CI  [which(threat=="ET" & newvar=="xp_line" )]    )
+
+line_threat_treatment <- factor(rep(1:6, c(
+                       length(CI  [which(threat=="ETNT" & newvar=="gal4line")]), 
+                       length(CI  [which(threat=="ETNT" & newvar=="uasline" )]),
+                       length(CI  [which(threat=="ETNT" & newvar=="xp_line" )]),
+                       
+                       length(CI  [which(threat=="ET" & newvar=="gal4line"  )]),  
+                       length(CI  [which(threat=="ET" & newvar=="uasline"   )]),  
+                       length(CI  [which(threat=="ET" & newvar=="xp_line"   )]))),
+            
+            labels = c(
+              "CI_gal4line; No threat",
+              "CI_uasline; ; No threat",
+              "CI_xp_line; No threat",  
+              
+              "CI_gal4line; Early threat",
+              "CI_uasline; Early threat",
+              "CI_xp_line; Early threat"))
+
+```
+
+```{r courtship index KW, echo=FALSE, comment=NA}
+kruskal.test(courtship_index,line_threat_treatment)
+```
+
+```{r courtship index post hoc, echo=FALSE, comment=NA}
+conover.test(courtship_index, line_threat_treatment, method="bonferroni", list=TRUE, table=F, kw=F )
+```
+
+```{r}
+# ACTION - SELECTION : DEFENSIVE INDEX - SUMMARY OF THE DATA & STATS - 
+```
+
+```{r summary data DI, echo=FALSE, paged.print=TRUE}
+
+a<-summary(DI[which(newvar=='gal4line' & threat == 'ETNT')])
+b<-length(DI[which(newvar=='gal4line' & threat == 'ETNT')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_nothreat'
+rownames(data1)<-c(names(a), 'sample_size')
+
+d<-summary(DI[which(newvar=='uasline' & threat == 'ETNT')])
+e<-length(DI[which(newvar=='uasline' & threat == 'ETNT')])
+data2<-matrix(c(d,e))
+colnames(data2)<-'uas_nothreat'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ETNT')])
+g<-length(DI[which(newvar=='xp_line' & threat == 'ETNT')])
+data3<-matrix(c(f,g))
+colnames(data3)<-'xp_nothreat'
+alldata_nothreat<-cbind(data1,data2,data3)
+
+h<-summary(DI[which(newvar=='gal4line' & threat == 'ET')])
+i<-length(DI[which(newvar=='gal4line' & threat == 'ET')])
+data4<-matrix(c(h,i))
+colnames(data4)<-'gal4_threat'
+
+j<-summary(DI[which(newvar=='uasline' & threat == 'ET')])
+k<-length(DI[which(newvar=='uasline' & threat == 'ET')])
+data5<-matrix(c(j,k))
+colnames(data5)<-'uas_threat'
+
+f<-summary(DI[which(newvar=='xp_line' & threat == 'ET')])
+g<-length(DI[which(newvar=='xp_line' & threat == 'ET')])
+data6<-matrix(c(f,g))
+colnames(data6)<-'xp_threat'
+alldata_threat<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_nothreat,alldata_threat)
+kable(alldata[c(-1,-6),], caption = "defensive index - summary by line and treatment")
+
+```
+
+
+```{r defensive index, include=FALSE}
+#Defensive index----
+
+defensive_index <- c(
+       DI [which(threat=="ETNT"  & newvar=="gal4line")],
+       DI [which(threat=="ETNT"  & newvar=="uasline")],
+       DI [which(threat=="ETNT"  & newvar=="xp_line")],
+      
+       DI [which(threat=="ET"  & newvar=="gal4line")],
+       DI [which(threat=="ET"  & newvar=="uasline")],
+       DI [which(threat=="ET"  & newvar=="xp_line")])
+
+line_threat_treatment <- factor(rep(1:6, c
+                      (length(DI [which(threat=="ETNT"  & newvar=="gal4line")]), 
+                       length(DI [which(threat=="ETNT"  & newvar=="uasline")]),
+                       length(DI [which(threat=="ETNT"  & newvar=="xp_line")]),
+                       
+                       length(DI [which(threat=="ET"  & newvar=="gal4line")]),  
+                       length(DI [which(threat=="ET"  & newvar=="uasline")]),  
+                       length(DI [which(threat=="ET"  & newvar=="xp_line")]))),
+                       
+            labels = c(
+              "DI_gal4line; No threat",
+              "DI _uasline; No threat",
+              "DI_xp_line;  No threat",  
+              
+              "DI_gal4line; Early threat",
+              "DI _uasline; Early threat",
+              "DI_xp_line;  Early threat"))
+
+```
+
+```{r}
+# ACTION - SELECTION : DEFENSIVE INDEX (DI)
+```
+
+```{r defensive index KW, echo=FALSE, comment=NA}
+kruskal.test(defensive_index,line_threat_treatment)
+```
+
+```{r defensive index post hoc, echo=FALSE, comment=NA, paged.print=TRUE}
+conover.test(defensive_index, line_threat_treatment, method="bonferroni", list=TRUE, table=F, kw=F )
+```
