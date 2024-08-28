@@ -1,0 +1,189 @@
+---
+title: "ANOVA stats"
+author: "Cazalé-Debat et al.2024"
+date: "mars 2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+rm(list=ls())
+data<-read.delim("/Users/cazaledl-admin/Library/CloudStorage/OneDrive-UniversityofBirmingham/Post_doc/XP/data/courtscape/screen/text/",
+                 h=T,sep="\t",na.strings = "NA", stringsAsFactors=T)
+library(rstatix)
+library(dplyr)
+
+#swap status_light with status_threat where appropriate
+
+
+data$newvar <- character(nrow(data))
+data$newvar[data$line == ""]      <- "gal4line"     
+data$newvar[data$line == ""]       <- "uasline"       
+data$newvar[data$line == ""] <- "xp_line"      
+attach(data)
+
+```
+
+```{r}
+# ACTION - SELECTION : COURTSHIP INDEX - SUMMARY OF THE DATA & STATS - 
+```
+
+```{r}
+#  summary of the data - COURTSHIP INDEX (CI)
+```
+
+```{r summary data, echo=FALSE, paged.print=TRUE}
+a<-summary(CI[which(newvar=='gal4line' & status_light=='OFF')])
+b<-length(CI[which(newvar=='gal4line' & status_light=='OFF')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_lightoff'
+rownames(data1)<-c(names(a), 'sample_size')
+
+c<-summary(CI[which(newvar=='uasline' & status_light=='OFF')])
+d<-length(CI[which(newvar=='uasline' & status_light=='OFF')])
+data2<-matrix(c(c,d))
+colnames(data2)<-'uas_lightoff'
+
+e<-summary(CI[which(newvar=='xp_line' & status_light=='OFF')])
+f<-length(CI[which(newvar=='xp_line' & status_light=='OFF')])
+data3<-matrix(c(e,f))
+colnames(data3)<-'xp_lightoff'
+alldata_lightoff<-cbind(data1,data2,data3)
+
+g<-summary(CI[which(newvar=='gal4line' & status_light=='ON')])
+h<-length(CI[which(newvar=='gal4line' & status_light=='ON')])
+data4<-matrix(c(g,h))
+colnames(data4)<-'gal4_lighton'
+
+i<-summary(CI[which(newvar=='uasline' & status_light=='ON')])
+j<-length(CI[which(newvar=='uasline' & status_light=='ON')])
+data5<-matrix(c(i,j))
+colnames(data5)<-'uas_lighton'
+
+k<-summary(CI[which(newvar=='xp_line' & status_light=='ON')])
+l<-length(CI[which(newvar=='xp_line' & status_light=='ON')])
+data6<-matrix(c(k,l))
+colnames(data6)<-'xp_lighton'
+alldata_lighton<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_lightoff,alldata_lighton)
+kable(alldata[c(-1,-6),], caption = "courtship index - summary by line and treatment")
+
+```
+
+
+```{r}
+res.aov2 <- aov(CI~status_light*line, data = data)
+```
+
+```{r}
+plot(res.aov2, 1) #visually check variance 
+```
+
+```{r}
+plot(res.aov2, 2) #visually check normality  
+```
+
+```{r}
+a=summary(res.aov2)
+a
+
+```
+
+```{r}
+
+b=TukeyHSD(res.aov2)$status_light
+b
+```
+
+```{r}
+c=TukeyHSD(res.aov2)$line
+c
+```
+
+```{r}
+d=TukeyHSD(res.aov2)$`status_light:line`
+d
+```
+
+
+
+```{r}
+# ACTION - SELECTION : DEFINSIVE INDEX - SUMMARY OF THE DATA & STATS - 
+```
+
+```{r}
+#  summary of the data - DEFINSIVE INDEX (CI)
+```
+
+```{r summary data defensive index, echo=FALSE, paged.print=TRUE}
+a<-summary(DI[which(newvar=='gal4line' & status_light=='OFF')])
+b<-length(DI[which(newvar=='gal4line' & status_light=='OFF')])
+data1<-matrix(c(a,b))
+colnames(data1)<-'gal4_lightoff'
+rownames(data1)<-c(names(a), 'sample_size')
+
+c<-summary(DI[which(newvar=='uasline' & status_light=='OFF')])
+d<-length(DI[which(newvar=='uasline' & status_light=='OFF')])
+data2<-matrix(c(c,d))
+colnames(data2)<-'uas_lightoff'
+
+e<-summary(DI[which(newvar=='xp_line' & status_light=='OFF')])
+f<-length(DI[which(newvar=='xp_line' & status_light=='OFF')])
+data3<-matrix(c(e,f))
+colnames(data3)<-'xp_lightoff'
+alldata_lightoff<-cbind(data1,data2,data3)
+
+g<-summary(DI[which(newvar=='gal4line' & status_light=='ON')])
+h<-length(DI[which(newvar=='gal4line' & status_light=='ON')])
+data4<-matrix(c(g,h))
+colnames(data4)<-'gal4_lighton'
+
+i<-summary(DI[which(newvar=='uasline' & status_light=='ON')])
+j<-length(DI[which(newvar=='uasline' & status_light=='ON')])
+data5<-matrix(c(i,j))
+colnames(data5)<-'uas_lighton'
+
+k<-summary(DI[which(newvar=='xp_line' & status_light=='ON')])
+l<-length(DI[which(newvar=='xp_line' & status_light=='ON')])
+data6<-matrix(c(k,l))
+colnames(data6)<-'xp_lighton'
+alldata_lighton<-cbind(data4,data5,data6)
+
+alldata<-cbind(alldata_lightoff,alldata_lighton)
+kable(alldata[c(-1,-6),], caption = "defensive index - summary by line and treatment")
+```
+
+```{r}
+res.aov3 <- aov(DI~status_light*line, data = data)
+```
+
+```{r}
+plot(res.aov3, 1) #visually check variance 
+```
+
+```{r}
+plot(res.aov3, 2) #visually check normality  
+```
+
+```{r}
+e=summary(res.aov3)
+e
+```
+
+```{r}
+f=TukeyHSD(res.aov3)$status_light
+f
+```
+
+```{r}
+g=TukeyHSD(res.aov3)$line
+g
+```
+
+```{r}
+h=TukeyHSD(res.aov3)$`status_light:line`
+h
+```
+
